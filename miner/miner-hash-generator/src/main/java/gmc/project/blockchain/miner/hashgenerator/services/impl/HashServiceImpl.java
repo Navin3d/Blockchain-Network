@@ -117,6 +117,8 @@ public class HashServiceImpl implements HashService {
 		returnValue.put("toAddress", transactionModel.getToAddress());
 		returnValue.put("data", transactionModel.getData());
 		returnValue.put("dateTime", transactionModel.getDateTime());
+		returnValue.put("previousHash", transactionModel.getPreviousHash());
+		returnValue.put("hash", transactionModel.getHash());
 		return returnValue;
 	}
 
@@ -126,6 +128,8 @@ public class HashServiceImpl implements HashService {
 		returnValue.setToAddress(jsonObject.get("toAddress").toString());
 		returnValue.setData(jsonObject.get("data").toString());
 		returnValue.setDateTime(LocalDateTime.parse(jsonObject.get("dateTime").toString()));
+		returnValue.setPreviousHash(jsonObject.get("previousHash").toString());
+		returnValue.setHash(jsonObject.get("hash").toString());
 		return returnValue;
 	}
 
