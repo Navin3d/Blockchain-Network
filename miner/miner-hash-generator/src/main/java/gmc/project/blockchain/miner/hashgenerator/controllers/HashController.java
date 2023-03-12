@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,14 +20,14 @@ public class HashController {
 	@Autowired
 	private HashService hashService;
 	
-	@GetMapping(path = "/block/{hash}")
-	public ResponseEntity<BlockModel> getBlockByHash(@PathVariable String hash) throws JSONException {
+	@PostMapping(path = "/block/get")
+	public ResponseEntity<BlockModel> getBlockByHash(@RequestBody String hash) throws JSONException {
 		BlockModel returnValue = hashService.getBlockModelFromHash(hash);
 		return ResponseEntity.status(HttpStatus.OK).body(returnValue);
 	}
 	
-	@GetMapping(path = "/transaction/{hash}")
-	public ResponseEntity<TransactionModel> getTransactionByHash(@PathVariable String hash) throws JSONException {
+	@PostMapping(path = "/transaction/get")
+	public ResponseEntity<TransactionModel> getTransactionByHash(@RequestBody String hash) throws JSONException {
 		TransactionModel returnValue = hashService.getTransactionModelFromHash(hash);
 		return ResponseEntity.status(HttpStatus.OK).body(returnValue);
 	}

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import com.fasterxml.jackson.databind.ser.std.StringSerializer;
+import gmc.project.blockchain.miner.hashgenerator.models.KafkaModel;
 
 @Configuration
 public class KafkaProducerConfig {
@@ -28,13 +29,13 @@ public class KafkaProducerConfig {
 		return configs;
 	}
 	
-	public ProducerFactory<String, Object> getProducer() {
+	public ProducerFactory<String, KafkaModel> getProducer() {
 		return new DefaultKafkaProducerFactory<>(getProducerConfiguration());
 	}
 	
 	@Bean
-	public KafkaTemplate<String, Object> kafkaTemplate() {
-		return new KafkaTemplate<String, Object>(getProducer());
+	public KafkaTemplate<String, KafkaModel> kafkaTemplate() {
+		return new KafkaTemplate<String, KafkaModel>(getProducer());
 	}
 
 }

@@ -10,7 +10,7 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "kafka")
 public class KafkaConfig {
 	
-private String serverUrl;
+	private String serverUrl;
 	
 	private String encodingTopic;	
 	private String encodingBlockGroupId;	

@@ -74,6 +74,7 @@ public class HashServiceImpl implements HashService {
 		JSONArray transactions = new JSONArray();
 		for (TransactionModel transactionModel : blockModel.getTransactions()) {
 			JSONObject transJsonObject = new JSONObject();
+			transJsonObject.put("transactionHash", transactionModel.getTransactionHash());
 			transJsonObject.put("fromAddress", transactionModel.getFromAddress());
 			transJsonObject.put("toAddress", transactionModel.getToAddress());
 			transJsonObject.put("data", transactionModel.getData());
@@ -88,6 +89,16 @@ public class HashServiceImpl implements HashService {
 		returnValue.put("hash", blockModel.getHash());
 		return returnValue;
 	}
+	
+	private JSONObject transactionModelToJSONObject(TransactionModel transactionModel) throws JSONException {
+		JSONObject returnValue = new JSONObject();
+		returnValue.put("transactionHash", transactionModel.getTransactionHash());
+		returnValue.put("fromAddress", transactionModel.getFromAddress());
+		returnValue.put("toAddress", transactionModel.getToAddress());
+		returnValue.put("data", transactionModel.getData());
+		returnValue.put("dateTime", transactionModel.getDateTime());
+		return returnValue;
+	}
 
 	private BlockModel jsonObjectToBlockModel(JSONObject jsonObject) throws JSONException {
 		List<TransactionModel> transactions = new ArrayList<>();
@@ -95,6 +106,7 @@ public class HashServiceImpl implements HashService {
 		for (int index = 0; index < jsonArrayTransaction.length(); index++) {
 			JSONObject transactionObj = jsonArrayTransaction.getJSONObject(index);
 			TransactionModel transactionModel = new TransactionModel();
+			transactionModel.setTransactionHash(transactionObj.get("transactionHash").toString());
 			transactionModel.setFromAddress(transactionObj.get("fromAddress").toString());
 			transactionModel.setToAddress(transactionObj.get("toAddress").toString());
 			transactionModel.setData(transactionObj.get("data").toString());
@@ -111,25 +123,13 @@ public class HashServiceImpl implements HashService {
 		return returnValue;
 	}
 
-	private JSONObject transactionModelToJSONObject(TransactionModel transactionModel) throws JSONException {
-		JSONObject returnValue = new JSONObject();
-		returnValue.put("fromAddress", transactionModel.getFromAddress());
-		returnValue.put("toAddress", transactionModel.getToAddress());
-		returnValue.put("data", transactionModel.getData());
-		returnValue.put("dateTime", transactionModel.getDateTime());
-		returnValue.put("previousHash", transactionModel.getPreviousHash());
-		returnValue.put("hash", transactionModel.getHash());
-		return returnValue;
-	}
-
 	private TransactionModel jsonObjectToTransactionModel(JSONObject jsonObject) throws JSONException {
 		TransactionModel returnValue = new TransactionModel();
+		returnValue.setTransactionHash(jsonObject.get("transactionHash").toString());
 		returnValue.setFromAddress(jsonObject.get("fromAddress").toString());
 		returnValue.setToAddress(jsonObject.get("toAddress").toString());
 		returnValue.setData(jsonObject.get("data").toString());
 		returnValue.setDateTime(LocalDateTime.parse(jsonObject.get("dateTime").toString()));
-		returnValue.setPreviousHash(jsonObject.get("previousHash").toString());
-		returnValue.setHash(jsonObject.get("hash").toString());
 		return returnValue;
 	}
 
@@ -141,10 +141,11 @@ public class HashServiceImpl implements HashService {
 			sb.append(hexString);
 		}
 		String result = sb.toString();
-		return result;
+		return "0x" + result;
 	}
 	
 	private String hexToString(String hexadecimalValue) {
+		hexadecimalValue = hexadecimalValue.substring(2, hexadecimalValue.length());
 		String result = new String();
 		char[] charArray = hexadecimalValue.toCharArray();
 		for (int i = 0; i < charArray.length; i = i + 2) {
@@ -162,6 +163,14 @@ public class HashServiceImpl implements HashService {
 		BlockModel returnValue = jsonObjectToBlockModel(jsonObject);
 		return returnValue;
 	}
+	
+	@Override
+	public TransactionModel getTransactionModelFromHash(String transactionHash) throws JSONException {
+		String data = decrypt(hexToString(transactionHash));
+		JSONObject jsonObject = new JSONObject(data);
+		TransactionModel returnValue = jsonObjectToTransactionModel(jsonObject);
+		return returnValue;
+	}
 
 	@Override
 	public String hashBlock(BlockModel blockModel) throws JSONException {
@@ -172,15 +181,8 @@ public class HashServiceImpl implements HashService {
 	}
 
 	@Override
-	public TransactionModel getTransactionModelFromHash(String transactionHash) throws JSONException {
-		String data = decrypt(hexToString(transactionHash));
-		JSONObject jsonObject = new JSONObject(data);
-		TransactionModel returnValue = jsonObjectToTransactionModel(jsonObject);
-		return returnValue;
-	}
-
-	@Override
 	public String hashTransaction(TransactionModel transactionModel) throws JSONException {
+		transactionModel.setTransactionHash(stringToHex(transactionModel.getTransactionHash()));
 		JSONObject jsonObj = transactionModelToJSONObject(transactionModel);
 		String encrypted = encrypt(jsonObj.toString());
 		String returnValue = stringToHex(encrypted);
