@@ -7,11 +7,11 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class BlockModel implements Serializable {
+public class BlockModel implements Serializable, Comparable<BlockModel>{
 
 	private static final long serialVersionUID = 5158779638584221144L;
 	
-	private String blockId;
+	private Integer blockId;
 	
 	private Integer nonce;
 	
@@ -20,5 +20,15 @@ public class BlockModel implements Serializable {
 	private String previousHash;
 	
 	private String hash;
+
+	@Override
+	public int compareTo(BlockModel o) {
+		if(this.blockId == o.getBlockId())
+			return 0;
+		else if(this.blockId > o.getBlockId())
+			return 1;
+		else
+			return -1;
+	}
 
 }

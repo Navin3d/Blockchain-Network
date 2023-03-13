@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import gmc.project.blockchain.miner.peer.models.BlockModel;
 import gmc.project.blockchain.miner.peer.models.TransactionModel;
 import lombok.Data;
 
@@ -19,7 +20,17 @@ public class BlockchainEntity implements Serializable {
 	@Id
 	private String id;
 	
-	private List<String> blocks = new ArrayList<>();
+	private String title;
+	
+	private String description;
+	
+	private String organization;
+	
+	private String coinName;
+	
+	private String coinSymbol;
+	
+	private List<BlockModel> blocks = new ArrayList<>();
 	
 	private List<TransactionModel> pendingTransactions = new ArrayList<>();
 

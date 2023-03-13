@@ -1,7 +1,6 @@
 package gmc.project.blockchain.miner.peer.models;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -18,6 +17,8 @@ public class TransactionModel implements Serializable {
 	
 	private String data;
 	
-	private LocalDateTime dateTime;
+	private String dateTime;
+	
+	private String previousHash;
 
 }
