@@ -1,11 +1,5 @@
 package gmc.project.blockchain.miner.hashgenerator.services.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,16 +7,13 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
-import gmc.project.blockchain.miner.hashgenerator.configurations.BlockchainConfig;
 import gmc.project.blockchain.miner.hashgenerator.models.BlockModel;
 import gmc.project.blockchain.miner.hashgenerator.models.KafkaModel;
 import gmc.project.blockchain.miner.hashgenerator.models.TransactionModel;
 import gmc.project.blockchain.miner.hashgenerator.services.ChainService;
 import gmc.project.blockchain.miner.hashgenerator.services.HashService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChainServiceImpl implements ChainService {
@@ -32,7 +23,6 @@ public class ChainServiceImpl implements ChainService {
 	private final String GENESISBLOCK = "GENESISBLOCK";
 	
 	private final HashService hashService;
-	private final BlockchainConfig blockchainConfig;
 	private final KafkaTemplate<String, KafkaModel> kafkaTemplate;
 
 	@Override
@@ -41,19 +31,8 @@ public class ChainServiceImpl implements ChainService {
 		
 	}
 	
-	private List<BlockModel> getBlockModel(List<String> chainHashList) throws JSONException {
-		List<BlockModel> returnValue = new ArrayList<>();
-		for(String chainHash : chainHashList) {
-			BlockModel blockModel = hashService.getBlockModelFromHash(chainHash);
-			returnValue.add(blockModel);
-		}
-		Collections.sort(returnValue);
-		return returnValue;
-	}
-	
 	@KafkaListener(topics = ENCRYPT, groupId = BLOCKCHAIN)
 	private void hashBlock(@Payload String kafkaModel) throws JSONException {
-		log.error(kafkaModel);
 		JSONObject jsonObject = new JSONObject(kafkaModel);
 		JSONObject blockJson = jsonObject.getJSONObject("block");
 		JSONObject transactionsJson = jsonObject.getJSONObject("transaction");
@@ -63,7 +42,6 @@ public class ChainServiceImpl implements ChainService {
 		String hash = hashService.sha256(transJsonObject.toString());
 		while (!hash.substring(0, 4).equals("0000")) {
 			hash = hashService.sha256(hash);
-			log.error(hash);
 		}
 		transactionModel.setTransactionHash(hash);
 		BlockModel blockModel = hashService.jsonObjectToBlockModel(blockJson);
@@ -71,7 +49,6 @@ public class ChainServiceImpl implements ChainService {
 		while (!blockHash.substring(0, 4).equals("0000")) {
 			blockModel.setNonce(blockModel.getNonce() + 1);
 			blockHash = hashService.sha256(hashService.hashBlock(blockModel));
-			log.error("2 - " + blockHash);
 		}
 		blockModel.setHash(blockHash);
 		blockModel.getTransactions().add(transactionModel);
