@@ -131,7 +131,7 @@ public class HashServiceImpl implements HashService {
 		returnValue.setToAddress(jsonObject.get("toAddress").toString());
 		returnValue.setData(jsonObject.get("data").toString());
 		returnValue.setDateTime(jsonObject.get("dateTime").toString());
-		returnValue.setTransactionHash(jsonObject.get("previousHash").toString());
+		returnValue.setPreviousHash(jsonObject.get("previousHash").toString());
 		return returnValue;
 	}
 

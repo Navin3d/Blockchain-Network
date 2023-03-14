@@ -37,7 +37,8 @@ public class CRUDServiceImpl implements CRUDService {
 	
 	@Override
 	public BlockchainEntity getBlockchain() throws InterruptedException, ExecutionException {
-		BlockchainEntity foundBlockchain = blockchainDao.findById(env.getProperty("blockchain.chainId")).toFuture().get();
+		String chainId = env.getProperty("blockchain.chain-id");
+		BlockchainEntity foundBlockchain = blockchainDao.findById(chainId).toFuture().get();
 		if(foundBlockchain == null)
 			throw new RuntimeException("Blockchain with Id: " + env.getProperty("blockchain.chainId") + " not found...");
 		return foundBlockchain;
@@ -84,8 +85,8 @@ public class CRUDServiceImpl implements CRUDService {
 		BlockchainEntity requiredBlockchain = getBlockchain();
 		BlockModel blockModel = conversionService.blockStringToBlockModel(blockString);
 		requiredBlockchain.getBlocks().add(blockModel);
-		log.error(blockModel.getHash());
-//		blockchainDao.save(requiredBlockchain);
+		log.error(requiredBlockchain.toString());		
+		blockchainDao.save(requiredBlockchain).toFuture().get();
 	}
 
 }

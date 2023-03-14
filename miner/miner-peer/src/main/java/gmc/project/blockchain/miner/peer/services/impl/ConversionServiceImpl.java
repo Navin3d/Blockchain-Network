@@ -11,13 +11,17 @@ import org.springframework.stereotype.Service;
 import gmc.project.blockchain.miner.peer.models.TransactionModel;
 import gmc.project.blockchain.miner.peer.models.BlockModel;
 import gmc.project.blockchain.miner.peer.services.ConversionService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class ConversionServiceImpl implements ConversionService {
 
 	@Override
 	public BlockModel blockStringToBlockModel(String blockString) throws NumberFormatException, JSONException {
-		JSONObject jsonObject = new JSONObject();
+		JSONObject kafkaModelJson = new JSONObject(blockString);
+		JSONObject jsonObject = kafkaModelJson.getJSONObject("block");
+		log.error(jsonObject.toString());
 		List<TransactionModel> transactions = new ArrayList<>();
 		JSONArray jsonArrayTransaction = jsonObject.getJSONArray("transactions");
 		for (int index = 0; index < jsonArrayTransaction.length(); index++) {
@@ -28,6 +32,7 @@ public class ConversionServiceImpl implements ConversionService {
 			transactionModel.setToAddress(transactionObj.get("toAddress").toString());
 			transactionModel.setData(transactionObj.get("data").toString());
 			transactionModel.setDateTime(transactionObj.get("dateTime").toString());
+			transactionModel.setPreviousHash(transactionObj.get("previousHash").toString());
 			transactions.add(transactionModel);
 		}
 
@@ -36,6 +41,7 @@ public class ConversionServiceImpl implements ConversionService {
 		returnValue.setNonce(Integer.valueOf(jsonObject.get("nonce").toString()));
 		returnValue.setTransactions(transactions);
 		returnValue.setPreviousHash(jsonObject.get("previousHash").toString());
+		returnValue.setHash(jsonObject.get("hash").toString());
 		return returnValue;
 	}
 

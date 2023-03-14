@@ -74,6 +74,7 @@ public class ChainServiceImpl implements ChainService {
 			log.error("2 - " + blockHash);
 		}
 		blockModel.setHash(blockHash);
+		blockModel.getTransactions().add(transactionModel);
 		KafkaModel kafkaModel2 = new KafkaModel();
 		kafkaModel2.setBlock(blockModel);
 		kafkaTemplate.send(GENESISBLOCK, kafkaModel2);
@@ -93,56 +94,56 @@ public class ChainServiceImpl implements ChainService {
 	
 	
 	
-	@KafkaListener(topics = ENCRYPT, groupId = BLOCKCHAIN)
-	private void hashBlockchain(@Payload String kafkaModel) throws JSONException {
-		log.error(kafkaModel);
-		JSONObject jsonObject = new JSONObject(kafkaModel);
-		JSONObject transactionsJson = jsonObject.getJSONObject("transaction");
-		
-		String jsonListString = jsonObject.get("blocks").toString();
-		Pattern listItem = Pattern.compile("\"(.*)\"");
-		Matcher matcher = listItem.matcher(jsonListString);
-		
-		List<String> chainList = new ArrayList<>();
-
-		while(matcher.find()) {
-			String hash = matcher.group().toString().replace("\"", "");
-			chainList.add(hash);
-			log.error(hash);
-		}
-		
-		TransactionModel selectedTransaction = hashService.jsonObjectToTransactionModel(transactionsJson);
-		
-		List<BlockModel> blockListModel = getBlockModel(chainList);
-		BlockModel requiredBlock = blockListModel.get(blockListModel.size() - 1);
-		
-		if(requiredBlock.getTransactions().size() < blockchainConfig.getMaxTransactionsPerBlock()) {
-			selectedTransaction.setTransactionHash(hashService.stringToHex(selectedTransaction.getTransactionHash()));
-			requiredBlock.getTransactions().add(selectedTransaction);
-		} else {
-			requiredBlock = new BlockModel();
-			BlockModel prevBlock = blockListModel.get(blockListModel.size() - 1);
-			Integer blockId = Integer.valueOf(prevBlock.getBlockId()) + 1;
-			requiredBlock.setBlockId(blockId);
-			String prevHash = hashService.hashBlock(prevBlock);
-			requiredBlock.setPreviousHash(prevHash);
-		}
-		
-		Integer nonce = 0;
-		String hash = "nnnnn";
-		
-		requiredBlock.getTransactions().add(selectedTransaction);
-		
-		while("0000" != hash.substring(0, 4)) {
-			requiredBlock.setNonce(nonce);
-			hash = hashService.hashBlock(requiredBlock);
-			log.error(nonce.toString());
-			log.error(hash);
-			nonce++;
-		}
-		
-		log.error(nonce.toString());
-		log.error(hash);
-	}
+//	@KafkaListener(topics = ENCRYPT, groupId = BLOCKCHAIN)
+//	private void hashBlockchain(@Payload String kafkaModel) throws JSONException {
+//		log.error(kafkaModel);
+//		JSONObject jsonObject = new JSONObject(kafkaModel);
+//		JSONObject transactionsJson = jsonObject.getJSONObject("transaction");
+//		
+//		String jsonListString = jsonObject.get("blocks").toString();
+//		Pattern listItem = Pattern.compile("\"(.*)\"");
+//		Matcher matcher = listItem.matcher(jsonListString);
+//		
+//		List<String> chainList = new ArrayList<>();
+//
+//		while(matcher.find()) {
+//			String hash = matcher.group().toString().replace("\"", "");
+//			chainList.add(hash);
+//			log.error(hash);
+//		}
+//		
+//		TransactionModel selectedTransaction = hashService.jsonObjectToTransactionModel(transactionsJson);
+//		
+//		List<BlockModel> blockListModel = getBlockModel(chainList);
+//		BlockModel requiredBlock = blockListModel.get(blockListModel.size() - 1);
+//		
+//		if(requiredBlock.getTransactions().size() < blockchainConfig.getMaxTransactionsPerBlock()) {
+//			selectedTransaction.setTransactionHash(hashService.stringToHex(selectedTransaction.getTransactionHash()));
+//			requiredBlock.getTransactions().add(selectedTransaction);
+//		} else {
+//			requiredBlock = new BlockModel();
+//			BlockModel prevBlock = blockListModel.get(blockListModel.size() - 1);
+//			Integer blockId = Integer.valueOf(prevBlock.getBlockId()) + 1;
+//			requiredBlock.setBlockId(blockId);
+//			String prevHash = hashService.hashBlock(prevBlock);
+//			requiredBlock.setPreviousHash(prevHash);
+//		}
+//		
+//		Integer nonce = 0;
+//		String hash = "nnnnn";
+//		
+//		requiredBlock.getTransactions().add(selectedTransaction);
+//		
+//		while("0000" != hash.substring(0, 4)) {
+//			requiredBlock.setNonce(nonce);
+//			hash = hashService.hashBlock(requiredBlock);
+//			log.error(nonce.toString());
+//			log.error(hash);
+//			nonce++;
+//		}
+//		
+//		log.error(nonce.toString());
+//		log.error(hash);
+//	}
 
 }
