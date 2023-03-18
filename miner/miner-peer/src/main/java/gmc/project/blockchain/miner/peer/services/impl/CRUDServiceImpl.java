@@ -26,8 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CRUDServiceImpl implements CRUDService {
 	
-	private final String ENCRYPT = "ENCRYPT";
-	private final String ENCRYPTED = "ENCRYPTED";
+	private final String ENCRYPTGENESISBLOCK = "ENCRYPTGENESISBLOCK";
 	private final String GENESISBLOCK = "GENESISBLOCK";
 	
 	private final Environment env;
@@ -76,7 +75,7 @@ public class CRUDServiceImpl implements CRUDService {
 		
 		kafkaModel.setBlock(genesisBlock);
 		kafkaModel.setTransaction(transaction);
-		kafkaTemplate.send(ENCRYPT, kafkaModel);
+		kafkaTemplate.send(ENCRYPTGENESISBLOCK, kafkaModel);
 	}
 	
 	@KafkaListener(topics = GENESISBLOCK, groupId = "GenecisBlock")
@@ -87,6 +86,12 @@ public class CRUDServiceImpl implements CRUDService {
 		requiredBlockchain.getBlocks().add(blockModel);
 		log.error(requiredBlockchain.toString());		
 		blockchainDao.save(requiredBlockchain).toFuture().get();
+	}
+
+	@Override
+	public BlockchainEntity save(BlockchainEntity blockchainEntity) throws InterruptedException, ExecutionException {
+		BlockchainEntity saved = blockchainDao.save(blockchainEntity).toFuture().get();
+		return saved;
 	}
 
 }

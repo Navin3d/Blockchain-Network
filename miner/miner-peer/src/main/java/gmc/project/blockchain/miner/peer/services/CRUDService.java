@@ -11,6 +11,8 @@ public interface CRUDService {
 	
 	public BlockchainEntity createBlockchain(BlockchainEntity blockchainEntity) throws InterruptedException, ExecutionException;
 	
-	public BlockModel getBlockByHash(String hash) throws InterruptedException, ExecutionException ;
-	public void initiateMiningGenesisBlock() throws InterruptedException, ExecutionException ;
+	public BlockModel getBlockByHash(String hash) throws InterruptedException, ExecutionException;
+	public void initiateMiningGenesisBlock() throws InterruptedException, ExecutionException;
+	
+	public BlockchainEntity save(BlockchainEntity blockchainEntity) throws InterruptedException, ExecutionException;
 }

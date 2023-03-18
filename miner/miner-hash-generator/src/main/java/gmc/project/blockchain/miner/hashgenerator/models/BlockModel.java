@@ -9,8 +9,8 @@ import lombok.Data;
 @Data
 public class BlockModel implements Serializable, Comparable<BlockModel>{
 
-	private static final long serialVersionUID = 5158779638584221144L;
-	
+	private static final long serialVersionUID = 3641710072724223161L;
+
 	private Integer blockId;
 	
 	private Integer nonce;
@@ -20,7 +20,7 @@ public class BlockModel implements Serializable, Comparable<BlockModel>{
 	private String previousHash;
 	
 	private String hash;
-
+	
 	@Override
 	public int compareTo(BlockModel o) {
 		if(this.blockId == o.getBlockId())
