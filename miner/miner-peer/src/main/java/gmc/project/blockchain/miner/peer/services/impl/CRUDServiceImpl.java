@@ -39,7 +39,7 @@ public class CRUDServiceImpl implements CRUDService {
 		String chainId = env.getProperty("blockchain.chain-id");
 		BlockchainEntity foundBlockchain = blockchainDao.findById(chainId).toFuture().get();
 		if(foundBlockchain == null)
-			throw new RuntimeException("Blockchain with Id: " + env.getProperty("blockchain.chainId") + " not found...");
+			throw new RuntimeException("Blockchain with Id: " + chainId + " not found...");
 		return foundBlockchain;
 	}
 

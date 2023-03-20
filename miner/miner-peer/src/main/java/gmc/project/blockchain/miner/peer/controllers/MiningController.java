@@ -32,7 +32,7 @@ public class MiningController {
 	
 	@GetMapping
 	public String addTransactionToQueue() throws InterruptedException, ExecutionException {
-		miningService.addTransactionsToBlockchain();
+		miningService.process();
 		return "Processing...";
 	}
 

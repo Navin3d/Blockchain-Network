@@ -1,8 +1,8 @@
-package gmc.project.blockchain.miner.peer.models;
+package gmc.project.blockchain.miner.hashchecker.models;
 
 import java.io.Serializable;
 
-import gmc.project.blockchain.miner.peer.entities.BlockchainEntity;
+import gmc.project.blockchain.miner.hashchecker.entities.BlockchainEntity;
 import lombok.Data;
 
 @Data

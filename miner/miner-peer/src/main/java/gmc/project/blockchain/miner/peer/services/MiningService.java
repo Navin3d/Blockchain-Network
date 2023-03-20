@@ -10,6 +10,6 @@ public interface MiningService {
 	public List<PendingTransactionModel> getAllPendingTransactions();
 	public void addTransactionToQueue(PendingTransactionModel pendingTransactionModel);
 	
-	public void addTransactionsToBlockchain() throws InterruptedException, ExecutionException ;
+	public void process() throws InterruptedException, ExecutionException;
 
 }

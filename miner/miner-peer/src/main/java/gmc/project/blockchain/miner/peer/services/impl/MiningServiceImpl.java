@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -29,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MiningServiceImpl implements MiningService {
 	
+	private final String VALIDATE = "VALIDATE";
+	private final String VALIDATED = "VALIDATED";
 	private final String ENCRYPTBLOCK = "ENCRYPTBLOCK";
 	private final String ENCRYPTEDBLOCK = "ENCRYPTEDBLOCK";
 
@@ -52,22 +55,39 @@ public class MiningServiceImpl implements MiningService {
 		pendingTransactions.add(pendingTransactionModel);
 	}
 	
-	@Override
-	public void addTransactionsToBlockchain() throws InterruptedException, ExecutionException {
-		validateBlockchain();
-		
-		PendingTransactionModel pendingTransactionModel = pendingTransactions.peek();
-		pendingTransactions.remove();
-		
-		log.error("Selected Transaction Priority: {}", pendingTransactionModel.getOrder());
-		
-		TransactionModel transaction = getHighPriorityTransaction(pendingTransactionModel);
+
+	public void process() throws InterruptedException, ExecutionException {
+		BlockchainEntity blockchainEntity = crudService.getBlockchain();
 		KafkaModel kafkaModel = new KafkaModel();
-		kafkaModel.setBlock(getBlockToHash(transaction));
+		kafkaModel.setBlockchainEntity(blockchainEntity);
+		kafkaTemplate.send(VALIDATE, kafkaModel);
+	}
+	
+	@KafkaListener(topics = VALIDATED, groupId = "Blockchain")
+	private void blockchainIsValid(@Payload String kafkaModelStr) throws InterruptedException, ExecutionException, JSONException {
+		JSONObject kafkaModelObj = new JSONObject(kafkaModelStr);
+		Boolean isValid = kafkaModelObj.getBoolean("isVlaid");
+		if(!isValid)
+			throw new RuntimeException("The chain is Broken...");
+		addTransactionsToBlockchain();
+	}
+	
+	private void addTransactionsToBlockchain() throws InterruptedException, ExecutionException{		
+		if(pendingTransactions.size() != 0) {
+			PendingTransactionModel pendingTransactionModel = pendingTransactions.peek();
+			pendingTransactions.remove();
+			
+			log.error("Selected Transaction Priority: {}", pendingTransactionModel.getOrder());
+			
+			TransactionModel transaction = getHighPriorityTransaction(pendingTransactionModel);
+			KafkaModel kafkaModel = new KafkaModel();
+			kafkaModel.setBlock(getBlockToHash(transaction));
+			
+			log.error(kafkaModel.getBlock().toString());
+			
+			kafkaTemplate.send(ENCRYPTBLOCK, kafkaModel);
+		}
 		
-		log.error(kafkaModel.getBlock().toString());
-		
-		kafkaTemplate.send(ENCRYPTBLOCK, kafkaModel);
 	}
 	
 	@KafkaListener(topics = ENCRYPTEDBLOCK, groupId = ENCRYPTEDBLOCK)
@@ -95,10 +115,6 @@ public class MiningServiceImpl implements MiningService {
 		if(!pendingTransactions.isEmpty()) {
 			addTransactionsToBlockchain();
 		}
-	}
-	
-	private void validateBlockchain() {
-		
 	}
 	
 	private TransactionModel getHighPriorityTransaction(PendingTransactionModel pendingTransactionModel) {
