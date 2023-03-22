@@ -1,5 +1,6 @@
 package gmc.project.blockchain.miner.peer.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +14,10 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gmc.project.blockchain.miner.peer.entities.BlockchainEntity;
 import gmc.project.blockchain.miner.peer.models.BlockModel;
@@ -89,6 +94,16 @@ public class MiningServiceImpl implements MiningService {
 		}
 		
 	}
+	
+	@KafkaListener(topics = "PROCESSED", groupId = "PYTHON")
+	private void getDataFromOrderer(@Payload String data) throws JsonMappingException, JsonProcessingException, InterruptedException, ExecutionException {
+		ObjectMapper mapper = new ObjectMapper();
+		PendingTransactionModel toAdd = mapper.readValue(data, PendingTransactionModel.class);
+		toAdd.setDateTime(LocalDateTime.now().toString());
+		addTransactionToQueue(toAdd);
+		addTransactionsToBlockchain();
+	}
+	
 	
 	@KafkaListener(topics = ENCRYPTEDBLOCK, groupId = ENCRYPTEDBLOCK)
 	private void storeBlock(@Payload String kafkaModel) throws NumberFormatException, JSONException, InterruptedException, ExecutionException {
