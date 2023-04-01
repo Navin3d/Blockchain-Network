@@ -1,13 +1,19 @@
 from rest_framework.views import APIView
-from configurations import eureka, kafka
+from configurations import eureka, kafka, general
 from rest_framework.response import Response
 from json import dumps
+import tensorflow as tf
 
 eureka.register()
+loaded_model = tf.keras.models.load_model(general.ML_MODEL_DIRECTORY)
 
 
 class Transaction(APIView):
     def post(self, request):
         data = request.data
+
+        order = loaded_model.predict([data["data"]])
+        data["order"] = order[0][0]
+
         kafka.publish_message("PROCESSED", "PYTHON", dumps(data))
         return Response(status=200, data=data)
