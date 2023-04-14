@@ -3,9 +3,13 @@ from configurations import eureka, kafka, general
 from rest_framework.response import Response
 from json import dumps
 import tensorflow as tf
+import os
+
 
 eureka.register()
-loaded_model = tf.keras.models.load_model(general.ML_MODEL_DIRECTORY)
+
+ml_url = os.path.abspath(os.getcwd()) + general.ML_MODEL_DIRECTORY
+loaded_model = tf.keras.models.load_model(ml_url)
 
 
 class Transaction(APIView):

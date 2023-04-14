@@ -1,1 +1,2 @@
-ML_MODEL_DIRECTORY = "D:\\Programming\\Java\\Spring_Projects\\Blockchain-Network\\miner\\miner_orderer_peer\\static\\ml_models\\Miner_Consensus"
+sep = "\\"
+ML_MODEL_DIRECTORY = f'{sep}static{sep}ml_models{sep}Miner_Consensus'
