@@ -17,7 +17,7 @@ class Transaction(APIView):
         data = request.data
 
         order = loaded_model.predict([data["data"]])
-        data["order"] = order[0][0]
+        data["order"] = float(order[0][0])
 
         kafka.publish_message("PROCESSED", "PYTHON", dumps(data))
         return Response(status=200, data=data)

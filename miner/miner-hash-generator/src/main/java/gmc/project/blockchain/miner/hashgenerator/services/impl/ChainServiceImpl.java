@@ -59,6 +59,7 @@ public class ChainServiceImpl implements ChainService {
 		String hash = hashService.sha256(transJsonObject.toString());
 		while (!hash.substring(0, 4).equals(hashPrefix)) {
 			hash = hashService.sha256(hash);
+			log.error(hash);
 		}
 		transactionModel.setTransactionHash(hash);
 		
@@ -68,6 +69,7 @@ public class ChainServiceImpl implements ChainService {
 		while (!blockHash.substring(0, 4).equals(hashPrefix)) {
 			blockModel.setNonce(blockModel.getNonce() + 1);
 			blockHash = hashService.sha256(hashService.hashBlock(blockModel));
+			log.error("2: {}", blockHash);
 		}
 		blockModel.setHash(blockHash);
 		
@@ -107,7 +109,7 @@ public class ChainServiceImpl implements ChainService {
 		while (!blockHash.substring(0, 4).equals(hashPrefix)) {
 			blockModel.setNonce(blockModel.getNonce() + 1);
 			blockHash = hashService.sha256(hashService.hashBlock(blockModel));
-			log.error(blockHash);
+			log.error("2: {}", blockHash);
 		}
 		blockModel.setHash(blockHash);
 		

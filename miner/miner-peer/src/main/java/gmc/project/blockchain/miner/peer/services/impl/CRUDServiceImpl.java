@@ -62,6 +62,7 @@ public class CRUDServiceImpl implements CRUDService {
 	public void initiateMiningGenesisBlock() throws InterruptedException, ExecutionException  {
 		KafkaModel kafkaModel = new KafkaModel();
 		TransactionModel transaction = new TransactionModel();
+		transaction.setOrder(0);
 		transaction.setFromAddress("oxnvn3d");
 		transaction.setToAddress("oxsampes");
 		transaction.setData("The Best Friend...");
