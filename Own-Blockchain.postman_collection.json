@@ -1,0 +1,330 @@
+{
+	"info": {
+		"_postman_id": "4ed10ea7-c3a4-4cc4-aa7b-9877e66a25e3",
+		"name": "Own-Blockchain",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17195439"
+	},
+	"item": [
+		{
+			"name": "Miner",
+			"item": [
+				{
+					"name": "Hash-Gen-Service",
+					"item": [
+						{
+							"name": "HashTransactionModel",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"transactionHash\": \"jnjjnjnijn\",\n    \"fromAddress\": \"navin\",\n    \"toAddress\": \"sam\",\n    \"data\": \"poda suni\",\n    \"dateTime\": \"2017-01-13T17:09:42.411\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://navins-mbp.domain.name:58815/hash/transaction",
+									"protocol": "http",
+									"host": [
+										"navins-mbp",
+										"domain",
+										"name"
+									],
+									"port": "58815",
+									"path": [
+										"hash",
+										"transaction"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Transaction From Hash",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "705a483344547a6c59674a59504b5a6a795a4a56654635526a686b5a63345564474777716844513244666453617354374735464d49694e794252426c5768534a614458344d6e44324869493377513556685a71394675417443664e393168536e794f576c51744b6242636d61417a6554737656736c555463494e304f466e316a39382f4131536a6558743075764c645661713050524a42694453455a4f2f6e30386c552b61482b664e4352736765424961797256743951736e36664678616271"
+								},
+								"url": {
+									"raw": "http://navins-mbp.domain.name:58815/hash/transaction/get",
+									"protocol": "http",
+									"host": [
+										"navins-mbp",
+										"domain",
+										"name"
+									],
+									"port": "58815",
+									"path": [
+										"hash",
+										"transaction",
+										"get"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Hash Block Model",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"blockId\": \"1\",\n    \"nonce\": 9898,\n    \"transactions\": [\n        {\n            \"transactionHash\": \"0x6a6e6a6a6e6a6e696a6e\",\n            \"fromAddress\": \"navin\",\n            \"toAddress\": \"sam\",\n            \"data\": \"poda suni\",\n            \"dateTime\": \"2017-01-13T17:09:42.411\"\n        }\n    ],\n    \"previousHash\": \"kmm\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://navins-mbp.domain.name:62574/hash/block",
+									"protocol": "http",
+									"host": [
+										"navins-mbp",
+										"domain",
+										"name"
+									],
+									"port": "62574",
+									"path": [
+										"hash",
+										"block"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Block From Hash",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "4e6939586a31686172495a34317343716c667337584f66652b2b385667696f2b666c4a797462567134574a676643397779436554486e73473477487257395430546b6f587154747968544f496845796b4c7a6d505135385853666c54777074312b7867795441756c47386d74736f6278374c5367572f5270367551723448745a305957626855507a6d4a6a724665416232487377335772497642507967416b45733635586d56516f524e414450645155534f2f7171566756456a64494d7a436b7a6437356f624367446a79493037494c55797970775963582f42663345536c6d375373732f45355276667430564474336f6e6655617476637137594e2f5a67704c4876303877514175646f6b794466584d6c36382b413d3d"
+								},
+								"url": {
+									"raw": "http://navins-mbp.domain.name:62574/hash/block/get",
+									"protocol": "http",
+									"host": [
+										"navins-mbp",
+										"domain",
+										"name"
+									],
+									"port": "62574",
+									"path": [
+										"hash",
+										"block",
+										"get"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Peer-Node",
+					"item": [
+						{
+							"name": "Create Blockchain",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"92\",\n    \"title\": \"Boomerism\",\n    \"description\": \"This an Blockchain.\",\n    \"organization\": \"GMC\",\n    \"coinName\": \"Euro 3\",\n    \"coinSymbol\": \"£3\",\n    \"blocks\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/crud",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"crud"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Mine Genesis Block",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/crud/inialize/genesis",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"crud",
+										"inialize",
+										"genesis"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Transaction To Queue",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"order\": 2,\n    \"fromAddress\": \"0x1\",\n    \"toAddress\": \"0x2\",\n    \"data\": \"Testing Queue\",\n    \"dateTime\": \"2017-01-13T17:09:42.411\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/mine/transaction/pending",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"mine",
+										"transaction",
+										"pending"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Pending transactions To Chain",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:51511/mine",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "51511",
+									"path": [
+										"mine"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Pending Transaction",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/mine/transaction/pending",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"mine",
+										"transaction",
+										"pending"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Orderer node",
+					"item": [
+						{
+							"name": "Concession",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"order\": 1,\n    \"fromAddress\": \"0xnvn3d\",\n    \"toAddress\": \"0xsamssuni\",\n    \"data\": \"brain_death\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8000/consensus/",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"consensus",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Gateway",
+					"item": []
+				},
+				{
+					"name": "Explorer",
+					"item": [
+						{
+							"name": "Get TX From",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"chainId\": \"92\",\n    \"hash\": \"oxnvn3d\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:52482/explorer/from",
+									"host": [
+										"localhost"
+									],
+									"port": "52482",
+									"path": [
+										"explorer",
+										"from"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
