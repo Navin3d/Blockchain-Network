@@ -35,7 +35,7 @@ public class HashServiceImpl implements HashService {
 		this.env = environment;
 		MessageDigest sha = null;
 		try {
-			key = env.getProperty("hashing.secret").getBytes(StandardCharsets.ISO_8859_1);
+			key = env.getProperty("blockchain.hash-secret").getBytes(StandardCharsets.ISO_8859_1);
 			sha = MessageDigest.getInstance("SHA-256");
 			key = sha.digest(key);
 			key = Arrays.copyOf(key, 16);

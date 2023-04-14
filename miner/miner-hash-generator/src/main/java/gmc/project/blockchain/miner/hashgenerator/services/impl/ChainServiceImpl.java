@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -16,7 +17,9 @@ import gmc.project.blockchain.miner.hashgenerator.models.TransactionModel;
 import gmc.project.blockchain.miner.hashgenerator.services.ChainService;
 import gmc.project.blockchain.miner.hashgenerator.services.HashService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChainServiceImpl implements ChainService {
@@ -27,6 +30,7 @@ public class ChainServiceImpl implements ChainService {
 	private final String ENCRYPTGENESISBLOCK = "ENCRYPTGENESISBLOCK";
 	private final String GENESISBLOCK = "GENESISBLOCK";
 	
+	private final Environment env;
 	private final HashService hashService;
 	private final KafkaTemplate<String, KafkaModel> kafkaTemplate;
 
@@ -38,18 +42,22 @@ public class ChainServiceImpl implements ChainService {
 	
 	@KafkaListener(topics = ENCRYPTGENESISBLOCK, groupId = BLOCKCHAIN)
 	private void hashGenesisBlock(@Payload String kafkaModel) throws JSONException {
+		final String hashPrefix = env.getProperty("blockchain.hash-prefix");
+		
 		JSONObject jsonObject = new JSONObject(kafkaModel);
 		JSONObject blockJson = jsonObject.getJSONObject("block");
 		JSONObject transactionsJson = jsonObject.getJSONObject("transaction");
 		
 		BlockModel blockModel = hashService.jsonObjectToBlockModel(blockJson);
+		blockModel.setHash("");
 		TransactionModel transactionModel = hashService.jsonObjectToTransactionModel(transactionsJson);
 		transactionModel.setData(hashService.encrypt(transactionModel.getData()));
+		transactionModel.setTransactionHash("");
 		JSONObject transJsonObject = hashService.transactionModelToJSONObject(transactionModel);
 		
 		
 		String hash = hashService.sha256(transJsonObject.toString());
-		while (!hash.substring(0, 4).equals("0000")) {
+		while (!hash.substring(0, 4).equals(hashPrefix)) {
 			hash = hashService.sha256(hash);
 		}
 		transactionModel.setTransactionHash(hash);
@@ -57,7 +65,7 @@ public class ChainServiceImpl implements ChainService {
 		
 		blockModel.getTransactions().add(transactionModel);
 		String blockHash = hashService.hashBlock(blockModel);
-		while (!blockHash.substring(0, 4).equals("0000")) {
+		while (!blockHash.substring(0, 4).equals(hashPrefix)) {
 			blockModel.setNonce(blockModel.getNonce() + 1);
 			blockHash = hashService.sha256(hashService.hashBlock(blockModel));
 		}
@@ -71,6 +79,8 @@ public class ChainServiceImpl implements ChainService {
 	
 	@KafkaListener(topics = ENCRYPTBLOCK, groupId = BLOCKCHAIN)
 	private void hashBlock(@Payload String kafkaModel) throws JSONException {
+		final String hashPrefix = env.getProperty("blockchain.hash-prefix");
+		
 		JSONObject jsonObject = new JSONObject(kafkaModel);
 		JSONObject blockJson = jsonObject.getJSONObject("block");
 		
@@ -85,17 +95,19 @@ public class ChainServiceImpl implements ChainService {
 		
 		
 		String hash = hashService.sha256(transJsonObject.toString());
-		while (!hash.substring(0, 4).equals("0000")) {
+		while (!hash.substring(0, 4).equals(hashPrefix)) {
 			hash = hashService.sha256(hash);
+			log.error(hash);
 		}
 		transactionModel.setTransactionHash(hash);
 		
 		
 		blockModel.getTransactions().add(transactionModel);
 		String blockHash = hashService.hashBlock(blockModel);
-		while (!blockHash.substring(0, 4).equals("0000")) {
+		while (!blockHash.substring(0, 4).equals(hashPrefix)) {
 			blockModel.setNonce(blockModel.getNonce() + 1);
 			blockHash = hashService.sha256(hashService.hashBlock(blockModel));
+			log.error(blockHash);
 		}
 		blockModel.setHash(blockHash);
 		
