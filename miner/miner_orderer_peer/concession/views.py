@@ -13,6 +13,10 @@ loaded_model = tf.keras.models.load_model(ml_url)
 
 
 class Transaction(APIView):
+    def get(self, request):
+        host = os.environ.get("HOST", default="ji")
+        return Response(status=200, data=host)
+
     def post(self, request):
         data = request.data
 
