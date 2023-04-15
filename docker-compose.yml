@@ -1,5 +1,17 @@
-version: "3"
+version: "3.7"
 services:
+  mongodb:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: docker
+      MONGO_INITDB_ROOT_PASSWORD: mongopw
+      MONGO_INITDB_DATABASE: own-blockchain
+    ports:
+      - "55000:27017"
+    volumes:
+      - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/*.js:ro
+      - mongodb_server_data:/data/db
   miner-discovery:
     image: navin3d/miner-discovery
     ports:
@@ -10,11 +22,29 @@ services:
       context: ./miner/miner_orderer_peer
       dockerfile: Dockerfile
     environment:
-      PORT: "8001"
-      HOST: "192.168.29.43"
+      PORT: "8000"
+      HOST: "miner-orderer"
       EUREKA_HOST: "miner-discovery"
+      EUREKA_PORT: 8010
+      KAFKA_HOST: "localhost"
+      KAFKA_PORT: 9092
     restart: "always"
-    ports:
-      - "8001:8000"
     depends_on:
       - miner-discovery
+  miner-explorer:
+    build:
+      context: ./miner/miner-explorer
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      EUREKA_HOST: miner-discovery
+      EUREKA_PORT: 8010
+    depends_on:
+      - miner-discovery
+      - mongodb
+    restart: always
+    ports:
+      - "8080:8080"
+volumes:
+  mongodb_server_data:

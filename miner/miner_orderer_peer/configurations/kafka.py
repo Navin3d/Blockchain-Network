@@ -5,7 +5,7 @@ from . import general
 def connect_kafka_producer():
     _producer = None
     try:
-        _producer = KafkaProducer(bootstrap_servers=[f'{general.HOST}:9092'], api_version=(0, 10))
+        _producer = KafkaProducer(bootstrap_servers=[f'{general.KAFKA_HOST}:{general.KAFKA_PORT}'], api_version=(0, 10))
     except Exception as ex:
         print('Exception while connecting Kafka')
         print(str(ex))
