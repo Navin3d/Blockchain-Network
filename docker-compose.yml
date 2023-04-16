@@ -56,8 +56,8 @@ services:
       HOST: "miner-orderer"
       EUREKA_HOST: "miner-discovery"
       EUREKA_PORT: 8010
-      KAFKA_HOST: localhost
-      KAFKA_PORT: 9094
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
   
   miner-explorer:
     image: navin3d/miner-explorer
