@@ -12,30 +12,57 @@ services:
     volumes:
       - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/*.js:ro
       - mongodb_server_data:/data/db
+  
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.2
+    ports:
+    # To learn about configuring Kafka for access across networks see
+    # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
+      - "9094:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,OUTSIDE://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      
   miner-discovery:
     image: navin3d/miner-discovery
     ports:
       - "8010:8010"
     restart: "always"
+  
   miner-orderer:
     build:
       context: ./miner/miner_orderer_peer
       dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    restart: "always"
+    depends_on:
+      - miner-discovery
     environment:
       PORT: "8000"
       HOST: "miner-orderer"
       EUREKA_HOST: "miner-discovery"
       EUREKA_PORT: 8010
-      KAFKA_HOST: "localhost"
-      KAFKA_PORT: 9092
-    restart: "always"
-    depends_on:
-      - miner-discovery
+      KAFKA_HOST: localhost
+      KAFKA_PORT: 9094
+  
   miner-explorer:
-    build:
-      context: ./miner/miner-explorer
-      dockerfile: Dockerfile
+    image: navin3d/miner-explorer
     environment:
+      SERVER_PORT: 8080
       SPRING_DATA_MONGODB_HOST: mongodb
       SPRING_DATA_MONGODB_PORT: 27017
       EUREKA_HOST: miner-discovery
@@ -46,5 +73,30 @@ services:
     restart: always
     ports:
       - "8080:8080"
+  
+  miner-peer:
+    build:
+      context: ./miner/miner-peer
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8080"
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      EUREKA_HOST: miner-discovery
+      EUREKA_PORT: 8010
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 9092
+    depends_on:
+      - miner-discovery
+      - mongodb
+      - kafka
+    restart: always
+  
 volumes:
   mongodb_server_data:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local

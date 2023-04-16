@@ -72,6 +72,11 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20220924</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

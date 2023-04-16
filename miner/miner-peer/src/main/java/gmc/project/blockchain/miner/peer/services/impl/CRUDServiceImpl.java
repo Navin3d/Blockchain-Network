@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.json.JSONException;
+
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
